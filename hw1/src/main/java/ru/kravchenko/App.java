@@ -2,6 +2,6 @@ package ru.kravchenko;
 
 public class App {
     public static void main(String[] args) {
-        System.out.println("Hello world!");
+        TestRunner.runTests(ExampleTest.class);
     }
 }
