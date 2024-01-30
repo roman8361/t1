@@ -19,8 +19,16 @@ public class TestRunner {
             // Фильтруем методы по аннотациям
             List<Method> beforeSuiteMethods = filterMethods(methods, BeforeSuite.class);
             List<Method> afterSuiteMethods = filterMethods(methods, AfterSuite.class);
-            List<Method> testMethods = filterMethods(methods, Test.class);
-
+            List<Method> testMethods = new ArrayList<>();
+            for (Method method : methods) {
+                if (method.isAnnotationPresent(Test.class)) {
+                    int priority = method.getAnnotation(Test.class).priority();
+                    if (priority < 1 || priority > 10) {
+                        throw new IllegalArgumentException("Test priority must be between 1 and 10.");
+                    }
+                    testMethods.add(method);
+                }
+            }
             // Проверяем, что метод с аннотацией BeforeSuite только один
             if (beforeSuiteMethods.size() > 1) {
                 throw new RuntimeException("More than one method annotated with @BeforeSuite");
