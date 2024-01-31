@@ -71,7 +71,7 @@ public class StreamTest {
 
         final var expectedNames = Arrays.asList("Charlie", "Frank", "Bob");
         final var topThreeEngineerNames = employees.stream()
-                .filter(e -> e.getPosition().equals("Engineer"))
+                .filter(e -> "Engineer".equals(e.getPosition()))
                 .sorted(Comparator.comparingInt(Employee::getAge).reversed())
                 .map(Employee::getName)
                 .distinct()
@@ -94,7 +94,7 @@ public class StreamTest {
                 new Employee("Frank", 74, "Engineer"),
                 new Employee("Grace", 63, "Engineer"));
         final var averageAgeOfEngineers = employees.stream()
-                .filter(employee ->"Engineer".equals(employee.getPosition()))
+                .filter(employee -> "Engineer".equals(employee.getPosition()))
                 .mapToDouble(Employee::getAge)
                 .average()
                 .orElse(0);
@@ -107,7 +107,7 @@ public class StreamTest {
      * Найдите в списке слов самое длинное
      */
     @Test
-    public void test06(){
+    public void test06() {
         final var words = Arrays.asList("apple", "banana", "grapefruit", "orange", "kiwi");
         final var expectedLongestWord = "grapefruit";
         final var findLongestWord = words.stream()
@@ -122,7 +122,7 @@ public class StreamTest {
      * хранится пары: слово - сколько раз оно встречается во входной строке
      */
     @Test
-    public void test07(){
+    public void test07() {
         final var input = "apple banana apple orange banana apple";
         final var countWordFrequency = Arrays.stream(input.split(" "))
                 .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
@@ -139,7 +139,7 @@ public class StreamTest {
      * то должен быть сохранен алфавитный порядок
      */
     @Test
-    public void test08(){
+    public void test08() {
         final var strings = Arrays.asList("banana", "apple", "kiwi", "orange", "grape", "pear");
         strings.stream()
                 .sorted(Comparator.comparing(String::length).thenComparing(Comparator.naturalOrder()))
@@ -151,7 +151,7 @@ public class StreamTest {
      * самое длинное, если таких слов несколько, получите любое из них
      */
     @Test
-    public void test09(){
+    public void test09() {
         String[][] arrayOfStrings = {
                 {"apple banana", "kiwi grape", "orange pear", "pineapple watermelon", "strawberry blueberry"},
                 {"cat", "dog", "elephant", "lion", "tiger"},
