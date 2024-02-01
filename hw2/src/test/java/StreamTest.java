@@ -2,6 +2,7 @@ import org.junit.Test;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
@@ -15,7 +16,8 @@ public class StreamTest {
         final var originalList = Arrays.asList(1, 2, 3, 4, 2, 3, 5, 6, 4, 7, 8, 9, 1);
         final var expectedList = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9);
         final var uniqueList = originalList.stream()
-                .distinct().collect(Collectors.toList());
+                .distinct() // чтобы получить поток уникальных элементов.
+                .collect(Collectors.toList());
 
         assertEquals(expectedList, uniqueList);
     }
@@ -28,10 +30,10 @@ public class StreamTest {
         final var numbers = Arrays.asList(5, 2, 10, 9, 4, 3, 10, 1, 13);
         final var expectedThirdLargest = 10;
         final int thirdLargest = numbers.stream()
-                .sorted((a, b) -> Integer.compare(b, a))
-                .skip(2)
+                .sorted((a, b) -> Integer.compare(b, a)) // сортируем в обратном порядке
+                .skip(2) // пропускаем первые два числа (наибольшие)
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("Список слишком короткий ))"));
 
         assertEquals(expectedThirdLargest, thirdLargest);
     }
@@ -45,11 +47,11 @@ public class StreamTest {
         final var numbers = Arrays.asList(5, 2, 10, 9, 4, 3, 10, 1, 13);
         final var expectedThirdUniqueLargest = 9;
         final int thirdUniqueLargest = numbers.stream()
-                .distinct()
-                .sorted((a, b) -> Integer.compare(b, a))
+                .distinct() // убираем дубликаты
+                .sorted(Comparator.reverseOrder()) // сортируем в обратном порядке
                 .skip(2)
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new IllegalArgumentException("Список слишком короткий"));
 
         assertEquals(expectedThirdUniqueLargest, thirdUniqueLargest);
     }
@@ -72,10 +74,9 @@ public class StreamTest {
         final var expectedNames = Arrays.asList("Charlie", "Frank", "Bob");
         final var topThreeEngineerNames = employees.stream()
                 .filter(e -> "Engineer".equals(e.getPosition()))
-                .sorted(Comparator.comparingInt(Employee::getAge).reversed())
-                .map(Employee::getName)
-                .distinct()
-                .limit(3)
+                .sorted(Comparator.comparingInt(Employee::getAge).reversed()) // Сортировка по убыванию возраста
+                .limit(3) // Ограничение до трех сотрудников
+                .map(Employee::getName) // Преобразование в список имен
                 .collect(Collectors.toList());
 
         assertEquals(expectedNames, topThreeEngineerNames);
@@ -95,8 +96,8 @@ public class StreamTest {
                 new Employee("Grace", 63, "Engineer"));
         final var averageAgeOfEngineers = employees.stream()
                 .filter(employee -> "Engineer".equals(employee.getPosition()))
-                .mapToDouble(Employee::getAge)
-                .average()
+                .mapToDouble(Employee::getAge) // Получение потока возрастов
+                .average() // Расчет среднего
                 .orElse(0);
 
         final var expectedAverageAge = (35D + 40D + 45D + 74D + 63) / 5.0;
@@ -158,12 +159,41 @@ public class StreamTest {
                 {"green", "red", "yellow", "blue", "purple"}
         };
         final String findLongestWord = Arrays.stream(arrayOfStrings)
-                .flatMap(Arrays::stream)
-                .flatMap(str -> Arrays.stream(str.split(" ")))
-                .max(Comparator.comparingInt(String::length))
+                .flatMap(Arrays::stream) // Преобразуем в один поток строк
+                .flatMap(str -> Arrays.stream(str.split(" "))) // Разбиваем на слова и преобразуем в поток
+                .max(Comparator.comparingInt(String::length)) // Находим максимальное по длине слово
                 .orElse("");
         final var expectedLongestWord = "watermelon";
 
         assertEquals(expectedLongestWord, findLongestWord);
+    }
+
+    /**
+     * Фильтрация пользователя по списку предикатов
+     */
+    @Test
+    public void test10() {
+        // Создаем список предикатов
+        List<Predicate<User>> predicates = new ArrayList<>();
+        predicates.add(user -> user.getAge() > 26);
+        predicates.add(user -> "Bob".equals(user.getName()));
+
+        List<User> finalUsersList = getUser().stream()
+                .filter(user -> predicates.stream().allMatch(predicate -> predicate.test(user)))
+                .collect(Collectors.toList());
+
+        assertEquals(finalUsersList.size(), 2);
+    }
+
+    private List<User> getUser() {
+        List<User> users = new ArrayList<>();
+        users.add(new User("Alice", 25, "New York", "Engineer", 50000));
+        users.add(new User("Bob", 30, "London", "Developer", 60000));
+        users.add(new User("Bob", 32, "London", "Developer", 60000));
+        users.add(new User("Bob", 15, "London", "Developer", 60000));
+        users.add(new User("Alice", 25, "New York", "Engineer", 50000));
+        users.add(new User("Alice", 18, "New York", "Engineer", 50000));
+        users.add(new User("Charlie", 30, "Paris", "Manager", 70000));
+        return users;
     }
 }
