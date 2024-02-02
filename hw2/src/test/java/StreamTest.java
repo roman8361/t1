@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -142,9 +143,16 @@ public class StreamTest {
     @Test
     public void test08() {
         final var strings = Arrays.asList("banana", "apple", "kiwi", "orange", "grape", "pear");
+        final var expectedResult = Arrays.asList("kiwi", "pear", "apple", "grape", "banana", "orange");
+        final var collect = strings.stream()
+                .sorted(Comparator.comparing(String::length).thenComparing(Comparator.naturalOrder()))
+                .collect(Collectors.toList());
+
         strings.stream()
                 .sorted(Comparator.comparing(String::length).thenComparing(Comparator.naturalOrder()))
                 .forEach(System.out::println);
+
+        assertEquals(collect, expectedResult);
     }
 
     /**
