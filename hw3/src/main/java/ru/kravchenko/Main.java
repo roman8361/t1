@@ -15,6 +15,7 @@ import java.util.concurrent.Executors;
  */
 
 public class Main {
+
     public static void main(String[] args) {
         // Создаем пул потоков с емкостью 3
         CustomThreadPool threadPool = new CustomThreadPool(3);
